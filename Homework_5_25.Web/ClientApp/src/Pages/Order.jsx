@@ -34,10 +34,12 @@ const Order = () => {
     const [specialRequests, setSpecialRequests] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [deliveryDate, setDeliveryDate] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const isFormValid = name && email && deliveryDate && quantity >= 1 && baseFlavor !== baseFlavors[0];
 
     const onSubmitClick = async () => {
+        setIsSubmitting(true);
         await axios.post('/api/cheesecakeordering/add', {
             name,
             email,
@@ -48,6 +50,7 @@ const Order = () => {
             deliveryDate,
             total: calculateTotal()
         });
+        setIsSubmitting(false);
         navigate('/success');
     }
 
@@ -93,12 +96,13 @@ const Order = () => {
                         {toppings.map(t => {
                             return <div key={t} className='form-check'>
                                 <input
+                                    id={`check${t}`}
                                     className='form-check-input'
                                     type='checkbox'
                                     checked={selectedToppings.includes(t)}
                                     onChange={() => onToppingsChange(t)}
                                 />
-                                <label className='form-check-label'>{t}</label>
+                                <label className='form-check-label' for={`check${t}`}>{t}</label>
                             </div>
                         })}
                     </div>
@@ -130,7 +134,7 @@ const Order = () => {
                             className='form-control'
                         />
                     </div>
-                    <button type='submit' onClick={onSubmitClick} disabled={!isFormValid} className='btn btn-primary'>Submit order</button>
+                    <button type='submit' onClick={onSubmitClick} disabled={!isFormValid} className='btn btn-primary'>{isSubmitting ? 'Submitting...' : 'Submit order'}</button>
                 </div>
 
                 <LivePreview
